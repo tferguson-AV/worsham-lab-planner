@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Worsham 2026 Lab Planner</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #fafafa;
+            color: #2d3748;
+            overflow-x: hidden;
+        }
+
+        /* Top Banner */
+        .top-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            height: 60px;
+        }
+
+        .banner-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .banner-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .dropdown-trigger {
+            position: relative;
+            padding: 10px 16px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #4a5568;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .dropdown-trigger:hover {
+            background: #f7fafc;
+            border-color: #cbd5e0;
+        }
+
+        .dropdown-trigger.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            min-width: 320px;
+            max-width: 380px;
+            max-height: 70vh;
+            overflow-y: auto;
+            display: none;
+            z-index: 1001;
+        }
+
+        .dropdown-menu.active {
+            display: block;
+        }
+
+        .dropdown-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 13px;
+            font-weight: 600;
+            color: #4a5568;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .dropdown-content {
+            padding: 12px;
+        }
+
+        /* Space Cards */
+        .space-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .space-card:hover {
+            border-color: #cbd5e0;
+            background: #f7fafc;
+        }
+
+        .space-card.selected {
+            border-color: #FFC107;
+            background: #fffbf0;
+            box-shadow: 0 2px 8px rgba(255, 193, 7, 0.2);
+        }
+
+        .space-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .space-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .color-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .space-dimensions {
+            font-size: 11px;
+            color: #718096;
+        }
+
+        .space-count-badge {
+            font-size: 11px;
+            color: #667eea;
+            background: #eef2ff;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .space-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .space-details.active {
+            max-height: 500px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .detail-section {
+            margin-bottom: 12px;
+        }
+
+        .detail-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #718096;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 12px;
+        }
+
+        .detail-label {
+            color: #718096;
+        }
+
+        .detail-value {
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .equipment-item {
+            background: #f7fafc;
+            padding: 8px;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            font-size: 11px;
+        }
+
+        .equipment-name {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 2px;
+        }
+
+        .equipment-meta {
+            color: #718096;
+            font-size: 10px;
+        }
+
+        /* Layout Slots */
+        .layout-slot {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        .layout-slot-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .layout-actions {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .layout-actions.active {
+            max-height: 200px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .layout-btn {
+            width: 100%;
+            padding: 10px;
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #4a5568;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s ease;
+        }
+
+        .layout-btn:hover {
+            background: #edf2f7;
+        }
+
+        /* Action Button */
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-danger {
+            background: white;
+            color: #e53e3e;
+            border: 1px solid #feb2b2;
+        }
+
+        .btn-danger:hover {
+            background: #fff5f5;
+        }
+
+        /* Map Container */
+        .map-container {
+            position: relative;
+            width: 100vw;
+            height: calc(100vh - 60px);
+            margin-top: 60px;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        #roomCanvas {
+            display: block;
+            max-width: 100%;
+            max-height: 100%;
+            touch-action: none;
+        }
+
+        /* Room Specs on Border */
+        .border-label {
+            position: absolute;
+            font-size: 11px;
+            color: #718096;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 4px 8px;
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        .border-label.top {
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .border-label.right {
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .border-label.bottom {
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .border-label.left {
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%) rotate(-90deg);
+        }
+
+        .border-label.door {
+            bottom: 12px;
+            left: 15%;
+        }
+
+        .border-label.window {
+            bottom: 12px;
+            left: 30%;
+        }
+
+        /* Rotate Button */
+        .rotate-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 50%;
+            transform: translateX(50%);
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            z-index: 999;
+        }
+
+        .rotate-btn.visible {
+            display: flex;
+        }
+
+        .rotate-btn:active {
+            transform: translateX(50%) scale(0.95);
+        }
+
+        /* Dropdown Overlay */
+        .dropdown-overlay {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: transparent;
+            z-index: 999;
+            display: none;
+        }
+
+        .dropdown-overlay.active {
+            display: block;
+        }
+
+        /* Mobile Ellipsis */
+        .mobile-menu-trigger {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            border: 1px solid #e2e8f0;
+            font-size: 20px;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (max-width: 767px) {
+            .banner-title {
+                font-size: 14px;
+            }
+
+            .dropdown-trigger {
+                display: none;
+            }
+
+            .mobile-menu-trigger {
+                display: flex;
+            }
+
+            .dropdown-menu {
+                position: fixed;
+                top: 60px;
+                right: 0;
+                left: 0;
+                max-width: 100%;
+                border-radius: 0;
+                max-height: calc(100vh - 60px);
+            }
+        }
+
+        .item-count {
+            font-size: 12px;
+            color: #718096;
+            background: #f7fafc;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Banner -->
+    <div class="top-banner">
+        <div class="banner-title">Worsham 2026 Lab Planner</div>
+        <div class="banner-actions">
+            <!-- Desktop Dropdowns -->
+            <div style="position: relative;">
+                <button class="dropdown-trigger" id="spacesBtn" onclick="toggleDropdown('spaces')">
+                    Spaces <span style="font-size: 10px;">▼</span>
+                </button>
+                <div class="dropdown-menu" id="spacesDropdown">
+                    <div class="dropdown-header">
+                        <span>Space Count</span>
+                        <span class="item-count" style="float: right; margin-top: -2px;">10 Total</span>
+                    </div>
+                    <div class="dropdown-content" id="spacesContent">
+                        <!-- Spaces will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <div style="position: relative;">
+                <button class="dropdown-trigger" id="layoutsBtn" onclick="toggleDropdown('layouts')">
+                    Layouts <span style="font-size: 10px;">▼</span>
+                </button>
+                <div class="dropdown-menu" id="layoutsDropdown">
+                    <div class="dropdown-header">Saved Layouts</div>
+                    <div class="dropdown-content">
+                        <div class="layout-slot" onclick="toggleLayoutActions('slot1')">
+                            <div class="layout-slot-header">
+                                <span>Layout 1</span>
+                                <span style="font-size: 18px;">›</span>
+                            </div>
+                            <div class="layout-actions" id="actions-slot1">
+                                <button class="layout-btn" onclick="event.stopPropagation(); overwriteLayout(1)">💾 Overwrite</button>
+                                <button class="layout-btn" onclick="event.stopPropagation(); loadLayoutSlot(1)">📂 Load</button>
+                            </div>
+                        </div>
+
+                        <div class="layout-slot" onclick="toggleLayoutActions('slot2')">
+                            <div class="layout-slot-header">
+                                <span>Layout 2</span>
+                                <span style="font-size: 18px;">›</span>
+                            </div>
+                            <div class="layout-actions" id="actions-slot2">
+                                <button class="layout-btn" onclick="event.stopPropagation(); overwriteLayout(2)">💾 Overwrite</button>
+                                <button class="layout-btn" onclick="event.stopPropagation(); loadLayoutSlot(2)">📂 Load</button>
+                            </div>
+                        </div>
+
+                        <div class="layout-slot" onclick="toggleLayoutActions('slot3')">
+                            <div class="layout-slot-header">
+                                <span>Layout 3</span>
+                                <span style="font-size: 18px;">›</span>
+                            </div>
+                            <div class="layout-actions" id="actions-slot3">
+                                <button class="layout-btn" onclick="event.stopPropagation(); overwriteLayout(3)">💾 Overwrite</button>
+                                <button class="layout-btn" onclick="event.stopPropagation(); loadLayoutSlot(3)">📂 Load</button>
+                            </div>
+                        </div>
+
+                        <div style="padding: 12px 0;">
+                            <button class="btn btn-danger" onclick="resetLayout()">🔄 Reset to Default</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Ellipsis -->
+            <button class="mobile-menu-trigger" onclick="toggleDropdown('mobile')">⋯</button>
+        </div>
+    </div>
+
+    <!-- Dropdown Overlay -->
+    <div class="dropdown-overlay" id="dropdownOverlay" onclick="closeAllDropdowns()"></div>
+
+    <!-- Map Container -->
+    <div class="map-container">
+        <canvas id="roomCanvas"></canvas>
+        
+        <!-- Border Labels -->
+        <div class="border-label top">14.3 ft.</div>
+        <div class="border-label right">10 ft.</div>
+        <div class="border-label left">10 ft.</div>
+        <div class="border-label bottom">143 sq ft</div>
+        <div class="border-label door">🚪 3.8 ft.</div>
+        <div class="border-label window">🪟 1.7 ft.</div>
+    </div>
+
+    <!-- Rotate Button -->
+    <button class="rotate-btn" id="rotateBtn" onclick="rotateSelected()">↻</button>
+
+    <script>
+        const canvas = document.getElementById('roomCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const ROOM_WIDTH = 172;
+        const ROOM_DEPTH = 120;
+        const DOOR_WIDTH = 46;
+        let SCALE = 4;
+        let OFFSET_X = 50;
+        let OFFSET_Y = 50;
+
+        const spaceEquipment = {
+            'Extraction': [
+                { vendor: 'Scientific Industries', equipment: 'Vortex Genie 2', model: 'G-560' },
+                { vendor: 'SciLogex', equipment: 'Microcentrifuge', model: '914041419999' },
+                { vendor: 'USA Scientific', equipment: 'Mixer HC', model: '9201' },
+                { vendor: 'USA Scientific', equipment: 'Microcentrifuge 24', model: 'Microcentrifuge 24' },
+                { vendor: 'VWR', equipment: 'Digital Heatblock', model: '12621-088' },
+                { vendor: 'Eppendorf', equipment: 'Thermomixer', model: '5382' }
+            ],
+            'Pre-Amp': [
+                { vendor: 'Covaris', equipment: 'Sonicator', model: 'ML230' },
+                { vendor: 'Scientific Industries', equipment: 'Vortex Genie 2', model: 'G-560' },
+                { vendor: 'SciLogex', equipment: 'Microcentrifuge', model: '914041419999' },
+                { vendor: 'Applied Biosystems', equipment: 'Thermocycler', model: 'A24812' },
+                { vendor: 'eppendorf', equipment: 'MixMate', model: 'PCB-11' },
+                { vendor: 'Eppendorf', equipment: 'Centrifuge', model: '5430' }
+            ],
+            'Post-Amp': [
+                { vendor: 'Scientific Industries', equipment: 'Vortex Genie 2', model: 'G-560' },
+                { vendor: 'VWR', equipment: 'Centrifuge', model: 'C1413' },
+                { vendor: 'Applied Biosystems', equipment: 'Thermocycler', model: 'ProFlex Base' },
+                { vendor: 'LabNet', equipment: 'Spectrafuge Mini (Strip Tube)', model: 'C1301' },
+                { vendor: 'USA Scientific', equipment: 'Mixer HC', model: '9201' },
+                { vendor: 'Eppendorf', equipment: 'Vacufuge Plus', model: '5305' },
+                { vendor: 'Magic Chef', equipment: 'Mini Fridge 4 degree C', model: 'HMAR440ST' },
+                { vendor: 'Magic Chef', equipment: 'Mini Fridge -20 degree C', model: 'MCUF3S2' }
+            ],
+            'QC+Seq': [
+                { vendor: 'Illumina', equipment: 'i100', model: 'i100' },
+                { vendor: 'Agilent', equipment: 'Tapestation', model: '4200' },
+                { vendor: 'Dell computer', equipment: 'Probook', model: '5974-0014' },
+                { vendor: 'Thermofisher', equipment: 'Qubit Floroumeter', model: 'Qubit 4' }
+            ],
+            'Blood': [
+                { vendor: 'eppendorf', equipment: 'Large Centrifuge', model: '5430 R' },
+                { vendor: 'Blood Centr.', equipment: 'Large Centrifuge', model: 'CM-75 Plus' },
+                { vendor: 'Sanyo', equipment: 'Mini Fridge 4 degree C', model: 'SR-4912M' }
+            ]
+        };
+
+        const spaceElectrical = {
+            'Extraction': { voltage: '120-240V', amps: '9.9A', watts: '1,080W', plugs: '6' },
+            'Pre-Amp': { voltage: '120-240V', amps: '16.4A', watts: '1,790W', plugs: '6' },
+            'Post-Amp': { voltage: '115-250V', amps: '13.3A', watts: '1,540W', plugs: '8' },
+            'QC+Seq': { voltage: '120V', amps: '14.6A', watts: '720W', plugs: '4' },
+            'Blood': { voltage: '120V', amps: '15.1A', watts: '1,420W', plugs: '3' }
+        };
+
+        let furniture = [
+            { id: 1, width: 60, depth: 25, x: 3, y: 3, rotation: 0, color: '#667eea', label: 'Extraction' },
+            { id: 2, width: 60, depth: 25, x: 70, y: 3, rotation: 0, color: '#667eea', label: 'Pre-Amp' },
+            { id: 3, width: 60, depth: 25, x: 65, y: 50, rotation: 90, color: '#667eea', label: 'Post-Amp' },
+            { id: 4, width: 60, depth: 25, x: 122, y: 50, rotation: 90, color: '#667eea', label: 'QC+Seq' },
+            { id: 5, width: 48, depth: 24, x: 32, y: 72, rotation: 90, color: '#48bb78', label: 'Blood' },
+            { id: 7, width: 25, depth: 16, x: 3, y: 35, rotation: 90, color: '#38b2ac', label: 'Ice-Maker' },
+            { id: 6, width: 41, depth: 23.5, x: 128, y: 3, rotation: 90, color: '#f56565', label: 'SVR' },
+            { id: 8, width: 18.5, depth: 17.7, x: 30, y: 6, rotation: 0, color: '#9f7aea', label: 'Fridge-4C' },
+            { id: 9, width: 18.5, depth: 17.7, x: 72, y: 6, rotation: 0, color: '#805ad5', label: 'Fridge-20C' },
+            { id: 10, width: 20.1, depth: 18.5, x: 62, y: 72, rotation: 0, color: '#b794f4', label: 'Fridge-Blood' },
+            { id: 11, width: 21, depth: 19, x: 25, y: 35, rotation: 0, color: '#10b981', label: 'Opentrons' }
+        ];
+
+        // Default layout configuration (Layout 1 - Custom from screenshot, within boundaries)
+        const defaultLayout = [
+            { id: 1, x: 3, y: 3, rotation: 0 },           // Extraction: top-left
+            { id: 2, x: 70, y: 3, rotation: 0 },          // Pre-Amp: top-center
+            { id: 3, x: 65, y: 50, rotation: 90 },        // Post-Amp: center, vertical
+            { id: 4, x: 122, y: 50, rotation: 90 },       // QC+Seq: right, vertical
+            { id: 5, x: 32, y: 72, rotation: 90 },        // Blood: bottom-left, vertical
+            { id: 7, x: 3, y: 35, rotation: 90 },         // Ice-Maker: left-middle, vertical
+            { id: 6, x: 128, y: 3, rotation: 90 },        // SVR: top-right, vertical
+            { id: 8, x: 30, y: 6, rotation: 0 },          // Fridge-4C: inside Extraction
+            { id: 9, x: 72, y: 6, rotation: 0 },          // Fridge-20C: inside Pre-Amp
+            { id: 10, x: 62, y: 72, rotation: 0 },        // Fridge-Blood: bottom-center
+            { id: 11, x: 25, y: 35, rotation: 0 }         // Opentrons: left-center
+        ];
+
+        let selectedObject = null;
+        let dragging = null;
+        let offsetDragX = 0;
+        let offsetDragY = 0;
+
+        // Auto-save default layout as Layout 1 if not already saved
+        function initializeDefaultLayout() {
+            if (!localStorage.getItem('layoutSlot1')) {
+                const layoutData = {
+                    slot: 1,
+                    date: new Date().toISOString(),
+                    furniture: defaultLayout
+                };
+                localStorage.setItem('layoutSlot1', JSON.stringify(layoutData));
+                console.log('✅ Default layout saved as Layout 1');
+            }
+        }
+
+        // Populate spaces dropdown
+        function populateSpaces() {
+            const container = document.getElementById('spacesContent');
+            const spaces = [
+                { label: 'Extraction', color: '#667eea', dimensions: '2.1 × 5 ft.', count: 6 },
+                { label: 'Pre-Amp', color: '#667eea', dimensions: '2.1 × 5 ft.', count: 6 },
+                { label: 'Post-Amp', color: '#667eea', dimensions: '2.1 × 5 ft.', count: 8 },
+                { label: 'QC+Seq', color: '#667eea', dimensions: '2.1 × 5 ft.', count: 4 },
+                { label: 'Blood', color: '#48bb78', dimensions: '2 × 4 ft.', count: 3 },
+                { label: 'Ice-Maker', color: '#38b2ac', dimensions: '2.1 × 1.3 ft.', count: 0 },
+                { label: 'SVR', color: '#f56565', dimensions: '2 × 3.4 × 6.5 ft.H', count: 0 },
+                { label: 'Fridge-4C', color: '#9f7aea', dimensions: '1.5 × 1.5 ft.', count: 0 },
+                { label: 'Fridge-20C', color: '#805ad5', dimensions: '1.5 × 1.5 ft.', count: 0 },
+                { label: 'Fridge-Blood', color: '#b794f4', dimensions: '1.7 × 1.5 ft.', count: 0 },
+                { label: 'Opentrons', color: '#10b981', dimensions: '1.8 × 1.6 ft.', count: 0 }
+            ];
+
+            let html = '';
+            spaces.forEach(space => {
+                const equipment = spaceEquipment[space.label] || [];
+                const electrical = spaceElectrical[space.label];
+                
+                html += `
+                    <div class="space-card" id="card-${space.label}" onclick="selectSpace('${space.label}')">
+                        <div class="space-card-header">
+                            <div class="space-name">
+                                <span class="color-dot" style="background: ${space.color};"></span>
+                                ${space.label}
+                                ${space.count > 0 ? `<span class="space-count-badge">${space.count} items</span>` : ''}
+                            </div>
+                            <div class="space-dimensions">${space.dimensions}</div>
+                        </div>
+                        ${electrical || equipment.length > 0 ? `
+                            <div class="space-details" id="details-${space.label}">
+                                ${electrical ? `
+                                    <div class="detail-section">
+                                        <div class="detail-section-title">Electrical</div>
+                                        <div class="detail-row">
+                                            <span class="detail-label">⚡ Voltage</span>
+                                            <span class="detail-value">${electrical.voltage}</span>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span class="detail-label">🔌 Amps</span>
+                                            <span class="detail-value">${electrical.amps}</span>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span class="detail-label">💡 Watts</span>
+                                            <span class="detail-value">${electrical.watts}</span>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span class="detail-label">🔌 Plugs</span>
+                                            <span class="detail-value">${electrical.plugs}</span>
+                                        </div>
+                                    </div>
+                                ` : ''}
+                                ${equipment.length > 0 ? `
+                                    <div class="detail-section">
+                                        <div class="detail-section-title">Equipment</div>
+                                        ${equipment.map((item, i) => `
+                                            <div class="equipment-item">
+                                                <div class="equipment-name">${i + 1}. ${item.equipment}</div>
+                                                <div class="equipment-meta">${item.vendor}${item.model ? ' • ' + item.model : ''}</div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                ` : ''}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function resizeCanvas() {
+            const container = document.querySelector('.map-container');
+            const availWidth = container.clientWidth;
+            const availHeight = container.clientHeight;
+            
+            const scaleX = (availWidth - 100) / ROOM_WIDTH;
+            const scaleY = (availHeight - 100) / ROOM_DEPTH;
+            SCALE = Math.min(scaleX, scaleY);
+            
+            canvas.width = ROOM_WIDTH * SCALE + 100;
+            canvas.height = ROOM_DEPTH * SCALE + 100;
+            
+            OFFSET_X = (canvas.width - ROOM_WIDTH * SCALE) / 2;
+            OFFSET_Y = (canvas.height - ROOM_DEPTH * SCALE) / 2;
+            
+            render();
+        }
+
+        function drawGrid() {
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.03)';
+            ctx.lineWidth = 1;
+            for (let x = 0; x <= ROOM_WIDTH; x += 12) {
+                ctx.beginPath();
+                ctx.moveTo(OFFSET_X + x * SCALE, OFFSET_Y);
+                ctx.lineTo(OFFSET_X + x * SCALE, OFFSET_Y + ROOM_DEPTH * SCALE);
+                ctx.stroke();
+            }
+            for (let y = 0; y <= ROOM_DEPTH; y += 12) {
+                ctx.beginPath();
+                ctx.moveTo(OFFSET_X, OFFSET_Y + y * SCALE);
+                ctx.lineTo(OFFSET_X + ROOM_WIDTH * SCALE, OFFSET_Y + y * SCALE);
+                ctx.stroke();
+            }
+        }
+
+        function drawRoom() {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            drawGrid();
+
+            ctx.strokeStyle = '#cbd5e0';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(OFFSET_X, OFFSET_Y, ROOM_WIDTH * SCALE, ROOM_DEPTH * SCALE);
+
+            const WINDOW_START = DOOR_WIDTH;
+            const WINDOW_WIDTH = 20;
+
+            // Door - BLACK
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            ctx.moveTo(OFFSET_X, OFFSET_Y + ROOM_DEPTH * SCALE);
+            ctx.lineTo(OFFSET_X + DOOR_WIDTH * SCALE, OFFSET_Y + ROOM_DEPTH * SCALE);
+            ctx.stroke();
+
+            // Window
+            ctx.strokeStyle = '#60a5fa';
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            ctx.moveTo(OFFSET_X + WINDOW_START * SCALE, OFFSET_Y + ROOM_DEPTH * SCALE);
+            ctx.lineTo(OFFSET_X + (WINDOW_START + WINDOW_WIDTH) * SCALE, OFFSET_Y + ROOM_DEPTH * SCALE);
+            ctx.stroke();
+
+            // Door arc
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.arc(OFFSET_X, OFFSET_Y + ROOM_DEPTH * SCALE, DOOR_WIDTH * SCALE, -Math.PI / 2, 0);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        function drawFurniture() {
+            furniture.forEach(item => {
+                ctx.save();
+                const centerX = OFFSET_X + (item.x + item.width / 2) * SCALE;
+                const centerY = OFFSET_Y + (item.y + item.depth / 2) * SCALE;
+                ctx.translate(centerX, centerY);
+                ctx.rotate(item.rotation * Math.PI / 180);
+
+                const isSelected = selectedObject && selectedObject.id === item.id;
+                const drawWidth = item.width * SCALE;
+                const drawDepth = item.depth * SCALE;
+
+                if (isSelected) {
+                    // Subtle yellow glow
+                    ctx.shadowColor = 'rgba(255, 193, 7, 0.5)';
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                }
+
+                ctx.fillStyle = item.color + (isSelected ? 'dd' : '99');
+                ctx.fillRect(-drawWidth / 2, -drawDepth / 2, drawWidth, drawDepth);
+
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+
+                // Yellow border when selected
+                ctx.strokeStyle = isSelected ? '#FFC107' : item.color;
+                ctx.lineWidth = isSelected ? 3 : 2;
+                ctx.strokeRect(-drawWidth / 2, -drawDepth / 2, drawWidth, drawDepth);
+
+                ctx.rotate(-item.rotation * Math.PI / 180);
+                ctx.fillStyle = isSelected ? '#2d3748' : '#4a5568';
+                ctx.font = isSelected ? 'bold 12px Inter' : '600 11px Inter';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(item.label, 0, -2);
+
+                const widthFt = (item.width / 12).toFixed(1);
+                const depthFt = (item.depth / 12).toFixed(1);
+                ctx.font = '9px Inter';
+                ctx.fillStyle = isSelected ? '#F59E0B' : '#718096';
+                ctx.fillText(`${widthFt} × ${depthFt} ft`, 0, 10);
+
+                ctx.restore();
+            });
+        }
+
+        function render() {
+            drawRoom();
+            drawFurniture();
+        }
+
+        function getMousePos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: (clientX - rect.left - OFFSET_X) / SCALE,
+                y: (clientY - rect.top - OFFSET_Y) / SCALE
+            };
+        }
+
+        function isPointInFurniture(x, y, item) {
+            const centerX = item.x + item.width / 2;
+            const centerY = item.y + item.depth / 2;
+            const localX = x - centerX;
+            const localY = y - centerY;
+            const angle = -item.rotation * Math.PI / 180;
+            const rotatedX = localX * Math.cos(angle) - localY * Math.sin(angle);
+            const rotatedY = localX * Math.sin(angle) + localY * Math.cos(angle);
+            return Math.abs(rotatedX) <= item.width / 2 && Math.abs(rotatedY) <= item.depth / 2;
+        }
+
+        function handleStart(e) {
+            const pos = getMousePos(e);
+            let clickedItem = null;
+            for (let i = furniture.length - 1; i >= 0; i--) {
+                if (isPointInFurniture(pos.x, pos.y, furniture[i])) {
+                    clickedItem = furniture[i];
+                    break;
+                }
+            }
+
+            if (clickedItem) {
+                selectedObject = clickedItem;
+                dragging = clickedItem;
+                offsetDragX = pos.x - dragging.x;
+                offsetDragY = pos.y - dragging.y;
+                
+                document.querySelectorAll('.space-card').forEach(c => c.classList.remove('selected'));
+                const card = document.getElementById('card-' + clickedItem.label);
+                if (card) card.classList.add('selected');
+                
+                document.getElementById('rotateBtn').classList.add('visible');
+                render();
+            } else {
+                selectedObject = null;
+                document.querySelectorAll('.space-card').forEach(c => c.classList.remove('selected'));
+                document.getElementById('rotateBtn').classList.remove('visible');
+                render();
+            }
+        }
+
+        function handleMove(e) {
+            if (dragging) {
+                e.preventDefault();
+                const pos = getMousePos(e);
+                let newX = pos.x - offsetDragX;
+                let newY = pos.y - offsetDragY;
+
+                const centerX = newX + dragging.width / 2;
+                const centerY = newY + dragging.depth / 2;
+                const rot = (dragging.rotation * Math.PI / 180);
+                const cos = Math.cos(rot);
+                const sin = Math.sin(rot);
+                const hw = dragging.width / 2;
+                const hd = dragging.depth / 2;
+                
+                const corners = [
+                    { x: -hw, y: -hd }, { x: hw, y: -hd },
+                    { x: hw, y: hd }, { x: -hw, y: hd }
+                ];
+                
+                let minX = Infinity, maxX = -Infinity;
+                let minY = Infinity, maxY = -Infinity;
+                
+                corners.forEach(corner => {
+                    const rotX = corner.x * cos - corner.y * sin;
+                    const rotY = corner.x * sin + corner.y * cos;
+                    minX = Math.min(minX, rotX);
+                    maxX = Math.max(maxX, rotX);
+                    minY = Math.min(minY, rotY);
+                    maxY = Math.max(maxY, rotY);
+                });
+                
+                const leftEdge = centerX + minX;
+                const rightEdge = centerX + maxX;
+                const topEdge = centerY + minY;
+                const bottomEdge = centerY + maxY;
+                
+                if (leftEdge < 0) newX += (0 - leftEdge);
+                if (rightEdge > ROOM_WIDTH) newX -= (rightEdge - ROOM_WIDTH);
+                if (topEdge < 0) newY += (0 - topEdge);
+                if (bottomEdge > ROOM_DEPTH) newY -= (bottomEdge - ROOM_DEPTH);
+
+                dragging.x = newX;
+                dragging.y = newY;
+                render();
+            }
+        }
+
+        function handleEnd(e) {
+            dragging = null;
+        }
+
+        canvas.addEventListener('mousedown', handleStart);
+        canvas.addEventListener('mousemove', handleMove);
+        canvas.addEventListener('mouseup', handleEnd);
+        canvas.addEventListener('touchstart', handleStart);
+        canvas.addEventListener('touchmove', handleMove);
+        canvas.addEventListener('touchend', handleEnd);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'r' || e.key === 'R') {
+                rotateSelected();
+            }
+        });
+
+        function rotateSelected() {
+            if (selectedObject) {
+                selectedObject.rotation = (selectedObject.rotation + 90) % 360;
+                render();
+            }
+        }
+
+        function selectSpace(label) {
+            const item = furniture.find(f => f.label === label);
+            if (item) {
+                selectedObject = item;
+                document.querySelectorAll('.space-card').forEach(c => c.classList.remove('selected'));
+                const card = document.getElementById('card-' + label);
+                if (card) card.classList.add('selected');
+                document.getElementById('rotateBtn').classList.add('visible');
+                render();
+            }
+            
+            const details = document.getElementById('details-' + label);
+            if (details) {
+                const isActive = details.classList.contains('active');
+                document.querySelectorAll('.space-details').forEach(d => d.classList.remove('active'));
+                if (!isActive) details.classList.add('active');
+            }
+        }
+
+        let currentDropdown = null;
+
+        function toggleDropdown(name) {
+            const dropdown = name === 'mobile' ? document.getElementById('spacesDropdown') : document.getElementById(name + 'Dropdown');
+            const btn = name === 'mobile' ? null : document.getElementById(name + 'Btn');
+            const overlay = document.getElementById('dropdownOverlay');
+            
+            if (currentDropdown === dropdown && dropdown.classList.contains('active')) {
+                dropdown.classList.remove('active');
+                if (btn) btn.classList.remove('active');
+                overlay.classList.remove('active');
+                currentDropdown = null;
+            } else {
+                closeAllDropdowns();
+                dropdown.classList.add('active');
+                if (btn) btn.classList.add('active');
+                overlay.classList.add('active');
+                currentDropdown = dropdown;
+            }
+        }
+
+        function closeAllDropdowns() {
+            document.querySelectorAll('.dropdown-menu').forEach(d => d.classList.remove('active'));
+            document.querySelectorAll('.dropdown-trigger').forEach(b => b.classList.remove('active'));
+            document.getElementById('dropdownOverlay').classList.remove('active');
+            currentDropdown = null;
+        }
+
+        function toggleLayoutActions(slotId) {
+            const actions = document.getElementById('actions-' + slotId);
+            const isActive = actions.classList.contains('active');
+            document.querySelectorAll('.layout-actions').forEach(a => a.classList.remove('active'));
+            if (!isActive) actions.classList.add('active');
+        }
+
+        function overwriteLayout(slot) {
+            const layoutData = {
+                slot: slot,
+                date: new Date().toISOString(),
+                furniture: furniture.map(item => ({ id: item.id, x: item.x, y: item.y, rotation: item.rotation }))
+            };
+            localStorage.setItem('layoutSlot' + slot, JSON.stringify(layoutData));
+            alert(`✅ Layout saved to Slot ${slot}`);
+            document.getElementById('actions-slot' + slot).classList.remove('active');
+        }
+
+        function loadLayoutSlot(slot) {
+            const layoutData = JSON.parse(localStorage.getItem('layoutSlot' + slot));
+            if (!layoutData) {
+                alert(`No layout saved in Slot ${slot}`);
+                return;
+            }
+            
+            layoutData.furniture.forEach(savedItem => {
+                const item = furniture.find(f => f.id === savedItem.id);
+                if (item) {
+                    item.x = savedItem.x;
+                    item.y = savedItem.y;
+                    item.rotation = savedItem.rotation;
+                }
+            });
+            
+            selectedObject = null;
+            document.querySelectorAll('.space-card').forEach(c => c.classList.remove('selected'));
+            document.getElementById('rotateBtn').classList.remove('visible');
+            render();
+            alert(`✅ Layout ${slot} loaded`);
+            document.getElementById('actions-slot' + slot).classList.remove('active');
+            closeAllDropdowns();
+        }
+
+        function resetLayout() {
+            if (!confirm('Reset to default layout?')) return;
+            
+            // Reset to default layout configuration
+            defaultLayout.forEach(savedItem => {
+                const item = furniture.find(f => f.id === savedItem.id);
+                if (item) {
+                    item.x = savedItem.x;
+                    item.y = savedItem.y;
+                    item.rotation = savedItem.rotation;
+                }
+            });
+            
+            selectedObject = null;
+            document.querySelectorAll('.space-card').forEach(c => c.classList.remove('selected'));
+            document.getElementById('rotateBtn').classList.remove('visible');
+            render();
+            closeAllDropdowns();
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('orientationchange', () => {
+            setTimeout(resizeCanvas, 100);
+        });
+
+        // Initialize and auto-save default layout as Layout 1
+        initializeDefaultLayout();
+        populateSpaces();
+        resizeCanvas();
+    </script>
+</body>
+</html>
